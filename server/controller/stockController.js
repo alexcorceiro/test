@@ -96,3 +96,26 @@ exports.getStockById = async (req, res) => {
       res.status(500).json({ message: err.message });
     }
   };
+
+  
+exports.getUserStock = async (req, res) => {
+  const user_id = req.user.id;
+
+  try {
+      const stocks = await prisma.stock.findMany({
+          where: {
+              user_id: user_id
+          }
+      });
+
+      let total = 0;
+
+      stocks.forEach(stock => {
+          total += Number(stock.quantity);
+      });
+
+      res.status(200).json({ total: total });
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
+};

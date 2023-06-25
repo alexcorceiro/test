@@ -14,9 +14,9 @@ function TabNavigator() {
         tabBarIcon: ({ focused }) => {
           let iconName;
 
-          if (route.name === "Home") {
+          if (route.name === "Acceuil") {
             iconName = focused ? IMAGE.HOME_SELECTED_ICON : IMAGE.HOME_ICON;
-          } else if (route.name === "Mon profil") {
+          } else if (route.name === "profile") {
             iconName =  IMAGE.PRO_ICON;
           }
 
@@ -27,8 +27,8 @@ function TabNavigator() {
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen name="Home" component={HomeStackNavigator} options={{ headerShown: false }} />
-      <Tab.Screen name="Settings" component={SettingsStackNavigator} options={{ headerShown: false }} />
+      <Tab.Screen name="Acceuil" component={HomeStackNavigator} options={{ headerShown: false }} />
+      <Tab.Screen name="profile" component={SettingsStackNavigator} options={{ headerShown: false }} />
     </Tab.Navigator>
   );
 }

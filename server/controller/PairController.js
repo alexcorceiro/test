@@ -41,30 +41,34 @@ exports.createPair = async (req, res) => {
 };
 
 exports.getPairById = async (req, res) => {
-    const { id } = req.params;
+  const id = Number(req.params.id);
+  if (isNaN(id)) {
+    return res.status(400).json({ message: 'id invalide' });
+  }
+
   try {
-    const pair = await prisma.pair.findUnique({
-      where: { id: Number(id) },
-    });
+      const pair = await prisma.pair.findUnique({
+          where: { id: id },
+      });
 
-    if (!pair) {
-      return res.status(404).json({ message: 'Pair not found' });
-    }
+      if (!pair) {
+        return res.status(404).json({ message: 'couple introuvable ' });
+      }
 
-    const male = await prisma.animal.findUnique({
-      where: { id: pair.male_id },
-    });
+      const male = await prisma.animal.findUnique({
+          where: { id: pair.male_id },
+      });
 
-    const female = await prisma.animal.findUnique({
-      where: { id: pair.female_id },
-    });
+      const female = await prisma.animal.findUnique({
+          where: { id: pair.female_id },
+      });
 
-    const pairWithDetails = { ...pair, male, female };
+      const pairWithDetails = { ...pair, male, female };
 
-    res.json(pairWithDetails);
-    } catch (err) {
+      res.json(pairWithDetails);
+  } catch (err) {
       res.status(500).json({ message: err.message });
-    }
+  }
 };
 
 exports.getAllPairs = async (req, res) => {
@@ -128,4 +132,14 @@ exports.deletePair = async (req, res) => {
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
+};
+
+
+exports.getPairCount = async (req, res) => {
+  try {  
+      const pairCount = await prisma.pair.count();
+      res.status(200).json({ count: pairCount });
+  } catch (err) {
+      res.status(500).json({ message: err.message });
+  }
 };

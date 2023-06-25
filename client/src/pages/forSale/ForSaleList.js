@@ -1,4 +1,6 @@
 import React, {useEffect, useState} from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+import CustomHeader from "../../components/CustomHeader";
 import { View, Text, TextInput, FlatList, StyleSheet } from "react-native"
 import { Card } from "react-native-paper"
 import axios from "axios"
@@ -27,6 +29,8 @@ export const AnimalForSaleList = ({ navigation }) => {
         )
 
     return(
+        <SafeAreaView style={{ flex: 1 }}>
+        <CustomHeader title="Les animaux a vendre list" isHome={true} navigation={navigation} />
         <View style={styles.container}>
         <TextInput
                 style={styles.searchInput}
@@ -50,6 +54,7 @@ export const AnimalForSaleList = ({ navigation }) => {
                 )}
             />
         </View>
+        </SafeAreaView>
     )
 }
 

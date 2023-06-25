@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, SafeAreaView } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomHeader from "../../components/CustomHeader";
+
 
 function StockDetails({ route, navigation }) {
   const { id } = route.params;
@@ -28,6 +30,8 @@ function StockDetails({ route, navigation }) {
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+    <CustomHeader title="detail du stock"  navigation={navigation} />
     <View style={styles.container}>
       {stock && (
         <>
@@ -45,6 +49,7 @@ function StockDetails({ route, navigation }) {
         </>
       )}
     </View>
+    </SafeAreaView>
   );
 }
 

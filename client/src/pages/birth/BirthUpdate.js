@@ -1,92 +1,90 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Button, Text, Alert, TouchableOpacity } from 'react-native';
-import { TextInput } from 'react-native-paper';
+import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
 import axios from 'axios';
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Picker } from '@react-native-picker/picker';
 
- function UpdateBirthScreen({ route, navigation }) {
-  const [date, setDate] = useState("");
-  const [number_babies, setNumberBabies] = useState(0);
-  const [animalName, setAnimalName] = useState("");
-  const [animals, setAnimals] = useState([]);
-  const [searchText, setSearchText] = useState("");
-  const id = route.params.id;
+
+const UpdateBirthScreen = ({ navigation, route }) => {
+  const [date, setDate] = useState('');
+  const [numberBabies, setNumberBabies] = useState('');
+  const [pairId, setPairId] = useState('');
+
+  const { id } = route.params;
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = await AsyncStorage.getItem("token");
-      const response = await axios.get(`http://localhost:8000/api/birth/${id}`, { headers: { Authorization: `Bearer ${token}`}})
-      setDate(response.data.date);
-      setNumberBabies(response.data.number_babies);
-      setAnimalName(response.data.animalName);
-      
-      const animalRes = await axios.get('http://localhost:8000/api/animal', { headers: { Authorization: `Bearer ${token}`}});
-      setAnimals(animalRes.data);
+    const fetchBirthData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.get(`http://localhost:7000/birth/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const birth = response.data;
+      setDate(birth.date);
+      setNumberBabies(birth.number_babies.toString());
+      setPairId(birth.pair_id.toString());
     };
-    fetchData();
+
+    fetchBirthData();
   }, []);
 
-  const handleUpdate = async () => {
-    const token = await AsyncStorage.getItem("token");
-    axios.put(`http://localhost:8000/api/birth/${id}`, { date, number_babies, animalName }, { headers: { Authorization: `Bearer ${token}`}})
-      .then(res => {
-        Alert.alert("Birth updated successfully!");
-        navigation.navigate('BirthListScreen');
-      })
-      .catch(err => console.log(err))
-  };
+  const updateBirth = async () => {
+    const token = await AsyncStorage.getItem('token');
+    let formData = new FormData();
+    formData.append('date', date);
+    formData.append('number_babies', numberBabies);
+    formData.append('pair_id', pairId);
 
-  const filteredAnimals = animals.filter(animal => animal.name.toLowerCase().includes(searchText.toLowerCase()) && animal.inCouple);
+    await axios.put(
+      `http://localhost:7000/birth/${id}`,
+      formData,
+      { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
+    );
+    navigation.navigate('BirthList');
+  };
 
   return (
     <View style={styles.container}>
-      <TextInput
-        label='Date of Birth'
-        value={date}
-        onChangeText={date => setDate(date)}
-        style={styles.input}
-      />
-      <TextInput
-        label='Number of Babies'
-        value={number_babies.toString()}
-        onChangeText={num => setNumberBabies(parseInt(num, 10))}
-        style={styles.input}
-      />
-      <TextInput
-        label='Animal Name'
-        value={animalName}
-        onChangeText={name => setAnimalName(name)}
-        style={styles.input}
-      />
-      <TextInput
-        label='Search Animal'
-        value={searchText}
-        onChangeText={text => setSearchText(text)}
-        style={styles.input}
-      />
-      {filteredAnimals.map((animal, index) => (
-        <TouchableOpacity key={index} onPress={() => setAnimalName(animal.name)}>
-          <Text>{animal.name}</Text>
-        </TouchableOpacity>
-      ))}
-      <Button title="Update" onPress={handleUpdate} />
+    <Text style={styles.headerText}>Update Birth</Text>
+    <View style={styles.inputContainer}>
+      <Text>Date</Text>
+      <TextInput value={date} onChangeText={setDate} style={styles.input} />
     </View>
+    <View style={styles.inputContainer}>
+      <Text>Number of Babies</Text>
+      <TextInput value={numberBabies} onChangeText={setNumberBabies} style={styles.input} keyboardType="numeric" />
+    </View>
+    <View style={styles.inputContainer}>
+      <Text>Pair ID</Text>
+      <TextInput value={pairId} onChangeText={setPairId} style={styles.input} keyboardType="numeric" />
+    </View>
+    <Button title="Update Birth" onPress={updateBirth} color="#841584" />
+    <Button title="Go Back" onPress={() => navigation.goBack()} color="#841584" />
+  </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    padding: 16,
-    backgroundColor: '#f5f5f5',
+    paddingHorizontal: 16,
+    backgroundColor: '#F5F5F5',
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  inputContainer: {
+    marginBottom: 10,
   },
   input: {
-    height: 50,
-    marginBottom: 20,
+    height: 40,
+    borderColor: 'gray',
     borderWidth: 1,
     padding: 10,
     borderRadius: 5,
+    backgroundColor: 'white',
   },
 });
 

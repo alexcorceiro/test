@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button  } from 'react-native';
+import { View, Text, StyleSheet, Button , SafeAreaView, } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import CustomHeader from "../../components/CustomHeader";
 function EventDetails({ route, navigation }) {
   const [event, setEvent] = useState(null);
   const { id } = route.params;
@@ -28,6 +28,8 @@ function EventDetails({ route, navigation }) {
   };
 
   return event ? (
+    <SafeAreaView style={{ flex: 1 }}>
+      <CustomHeader title="detail de evenement"  navigation={navigation} />
     <View style={styles.container}>
       <Text style={styles.text}>Title: {event.title}</Text>
       <Text style={styles.text}>Description: {event.description}</Text>
@@ -41,6 +43,7 @@ function EventDetails({ route, navigation }) {
         title="supprimer evenement"
         onPress={handleDelete}/>
     </View>
+    </SafeAreaView>
   ) : null;
 }
 

@@ -1,12 +1,14 @@
-// AddAnimalScreen.js
 import React, { useState } from 'react';
-import { View, TextInput, Text,  Button, StyleSheet, Image } from 'react-native';
-import axios from 'axios';
-import { Picker } from '@react-native-picker/picker';
+import { SafeAreaView } from "react-native-safe-area-context";
+import CustomHeader from "../../components/CustomHeader";
+import { View, Text, Image, StyleSheet, Button, Platform } from 'react-native';
+import { Input } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
+import axios from 'axios';
+import FormData from 'form-data';
 
-const AddAnimalScreen = ({ navigation }) => {
+const AddAnimalScreen = () => {
   const [name, setName] = useState('');
   const [species, setSpecies] = useState('');
   const [ring, setRing] = useState('');
@@ -21,122 +23,77 @@ const AddAnimalScreen = ({ navigation }) => {
       aspect: [4, 3],
       quality: 1,
     });
-    
+  
     if (!result.canceled) {
-      let { assets } = result;
-      let selectedAsset = assets[0]; // If you only select one image or video, it will be the first item in the array.
-    
-      console.log(selectedAsset.duration);
-
-      // Assuming only one image is selected, set the image state
-      setImage(assets[0].uri);
+      setImage(result.assets[0].uri);
     }
-};
+  };
 
   const addAnimal = async () => {
     const token = await AsyncStorage.getItem('token');
-    let formData = new FormData();
+
+    const formData = new FormData();
+    formData.append('image', {
+      name: 'image.jpg',
+      type: 'image/jpeg',
+      uri: image,
+    });
     formData.append('name', name);
     formData.append('species', species);
     formData.append('ring', ring);
     formData.append('gender', gender);
     formData.append('birthdate', birthdate);
-    formData.append('image', {
-      uri: image,
-      type: 'image/jpeg',
-      name: 'testPhoto.jpg',
-    });
 
-    await axios.post(
-      'http://localhost:7000/animal',
-      formData,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        }
-      }
-    );
-    navigation.navigate('AnimalList');
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    axios
+      .post('http://localhost:7000/animal', formData, config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+        <CustomHeader title="Nouveau Animal"  navigation={navigation} />
     <View style={styles.container}>
-      <Text style={styles.headerText}>Add New Animal</Text>
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Name</Text>
-        <TextInput value={name} onChangeText={setName} style={styles.input} />
-        <Text style={styles.label}>Species</Text>
-        <TextInput value={species} onChangeText={setSpecies} style={styles.input} />
-        <Text style={styles.label}>Ring</Text>
-        <TextInput value={ring} onChangeText={setRing} style={styles.input} />
-       <View style={styles.inputContainer}>
-        <Text>Gender</Text>
-        <Picker
-          selectedValue={gender}
-          onValueChange={(itemValue) => setGender(itemValue)}
-          style={styles.select}
-        >
-          <Picker.Item label="Male" value="Male" />
-          <Picker.Item label="Female" value="Female" />
-        </Picker>
-      </View>
-        <Text style={styles.label}>Birthdate</Text>
-        <TextInput value={birthdate} onChangeText={setBirthdate} style={styles.input} />
-        <Button title="Pick an image" onPress={pickImage} color="#841584" />
-        {image && <Image source={{ uri: image }} style={styles.image} />}
-        <Button title="Add Animal" onPress={addAnimal} color="#841584" style={styles.button} />
-      </View>
+      <Text style={styles.title}>Add Animal</Text>
+      <Input placeholder="Name" value={name} onChangeText={setName} />
+      <Input placeholder="Species" value={species} onChangeText={setSpecies} />
+      <Input placeholder="Ring" value={ring} onChangeText={setRing} />
+      <Input placeholder="Gender" value={gender} onChangeText={setGender} />
+      <Input placeholder="Birthdate" value={birthdate} onChangeText={setBirthdate} />
+      {image && <Image source={{ uri: image }} style={styles.image} />}
+      <Button title="Pick an image" onPress={pickImage} />
+      <Button title="Add Animal" onPress={addAnimal} />
     </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
-    backgroundColor: '#F5F5F5',
-    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 20,
   },
-  headerText: {
-    fontSize: 24,
+  title: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
-    marginTop: 50,
     marginBottom: 20,
   },
-  inputContainer: {
-    width: '100%',
-    maxWidth: 400,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
-  },
-  input: {
-    height: 40,
-    borderColor: '#888',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    backgroundColor: 'white',
-  },
-  select: {
-    width: 90,
-    height: 40
-  },
   image: {
-    width: 200, 
-    height: 200, 
-    alignSelf: 'center', 
-    margin: 10,
-    borderRadius: 10, 
-  },
-  button: {
-    marginTop: 20,
+    width: 200,
+    height: 200,
+    marginBottom: 20,
   },
 });
 

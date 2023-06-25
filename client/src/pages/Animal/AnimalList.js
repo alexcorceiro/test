@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { SafeAreaView } from "react-native-safe-area-context";
+import CustomHeader from "../../components/CustomHeader";
 import { View, FlatList, StyleSheet, Button, Text } from 'react-native';
 import { Searchbar, Card } from 'react-native-paper';
 import axios from 'axios';
@@ -14,6 +16,7 @@ const AnimalListScreen = ({ navigation }) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     setAnimals(response.data);
+    console.log(response)
   };
 
   const searchAnimals = () => {
@@ -29,8 +32,10 @@ const AnimalListScreen = ({ navigation }) => {
   }, []);
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <CustomHeader title="Animal List" isHome={true} navigation={navigation} />
     <View style={styles.container}>
-    <Text style={styles.headerText}>Animal List</Text>
+    {/* <Text style={styles.headerText}>Animal List</Text> */}
     <Searchbar
       placeholder="Search Animals"
       onChangeText={query => setSearchQuery(query)}
@@ -64,6 +69,7 @@ const AnimalListScreen = ({ navigation }) => {
       )}
     />
   </View>
+  </SafeAreaView>
   );
 };
 

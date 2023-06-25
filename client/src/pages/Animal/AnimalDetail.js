@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, Image, StyleSheet } from 'react-native';
+import { View, Text, Button, Image, StyleSheet, SafeAreaView } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CustomHeader from "../../components/CustomHeader";
+
 
 const AnimalDetailScreen = ({ route, navigation }) => {
   const [animal, setAnimal] = useState(null);
@@ -13,7 +15,7 @@ const AnimalDetailScreen = ({ route, navigation }) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     setAnimal(response.data);
-  };
+    console.log(response)  };
 
   const handleUpdate = () => {
     navigation.navigate('UpdateAnimal', { id });
@@ -34,6 +36,8 @@ const AnimalDetailScreen = ({ route, navigation }) => {
   }, []);
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+    <CustomHeader title="detail de l'animal"  navigation={navigation} />
     <View style={styles.container}>
     {animal && (
       <>
@@ -68,6 +72,7 @@ const AnimalDetailScreen = ({ route, navigation }) => {
       </>
     )}
   </View>
+  </SafeAreaView>
   );
 };
 

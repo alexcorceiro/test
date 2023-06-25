@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Button, StyleSheet } from 'react-native';
-import { Searchbar, Card } from 'react-native-paper';
+import { SafeAreaView, View, StyleSheet, Button } from 'react-native';
+import { Card, Title, Paragraph, Searchbar } from 'react-native-paper';
 import axios from 'axios';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomHeader from "../../components/CustomHeader";
 
-const PairList = ({ navigation }) => {
+
+function PairList({ navigation }) {
   const [pairs, setPairs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -19,31 +21,35 @@ const PairList = ({ navigation }) => {
   }, []);
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+    <CustomHeader title="La liste des couples" isHome={true} navigation={navigation} />
     <View style={styles.container}>
       <Searchbar
-        placeholder="Search"
+        placeholder="Chercher"
         onChangeText={(query) => setSearchQuery(query)}
         value={searchQuery}
       />
       <Button
-        title="Add Pair"
+        title="Ajouter un couple"
         onPress={() => navigation.navigate('AddPair')}
       />
-      {pairs.map((pair) => {
-        const [male, female] = pair.animal;
-        return (
-          <Card key={pair.id} style={styles.card}>
-            <Card.Title title={male?.name || 'Loading...'} subtitle={female?.name || 'Loading...'} />
-            <Card.Content>
-              <Button
-                title="Details"
-                onPress={() => navigation.navigate('PairDetail', { id: pair.id })}
-              />
-            </Card.Content>
-          </Card>
-        );
-      })}
+      {pairs.map((pair) => (
+        <Card key={pair.id} style={styles.card}>
+          {pair.animal.map((animal, index) => (
+            <View key={index}>
+              <Title>{animal.name}</Title>
+            </View>
+          ))}
+          <Card.Content>
+            <Button
+              title="Details"
+              onPress={() => navigation.navigate('PairDetail', { id: pair.id })}
+            />
+          </Card.Content>
+        </Card>
+      ))}
     </View>
+    </SafeAreaView>
   );
 }
 
@@ -55,6 +61,18 @@ const styles = StyleSheet.create({
   card: {
     marginVertical: 8,
   },
+  title: {
+    fontSize: 20,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "gray"
+  },
+  date: {
+    fontSize: 14,
+    color: "gray",
+    marginTop: 4
+  }
 });
 
 export default PairList;

@@ -5,7 +5,7 @@ const path = require('path')
 exports.createAnimal = async (req, res) => {
   const { name, species, ring, gender, birthdate} = req.body;
   const user_id = req.user.id;
-  const image = req.file ? path.join('uploads', String(req.user.id), req.file.filename) : null;
+  const image = req.file ? path.join('images',String(req.user.id), req.file.filename) : null;
 
   try {
     const newAnimal = await prisma.animal.create({

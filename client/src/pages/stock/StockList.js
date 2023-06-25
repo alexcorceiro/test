@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { SafeAreaView } from "react-native-safe-area-context";
+import CustomHeader from "../../components/CustomHeader";
 import { View, Button, StyleSheet } from 'react-native';
 import { Searchbar, Card } from 'react-native-paper';
 import axios from 'axios';
@@ -20,6 +22,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
   }, []);
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+    <CustomHeader title="Les stock list" isHome={true} navigation={navigation} />
     <View style={styles.container}>
       <Searchbar
         placeholder="Search"
@@ -42,6 +46,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
         </Card>
       ))}
     </View>
+    </SafeAreaView>
   );
 }
 

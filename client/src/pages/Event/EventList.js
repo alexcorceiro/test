@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { SafeAreaView } from "react-native-safe-area-context";
+import CustomHeader from "../../components/CustomHeader";
 import { View, Button, StyleSheet } from 'react-native';
 import { Searchbar, Card } from 'react-native-paper';
 import axios from 'axios';
@@ -19,6 +21,8 @@ function EventList({ navigation }) {
   }, []);
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+    <CustomHeader title="Evenement List" isHome={true} navigation={navigation} />
     <View style={styles.container}>
       <Searchbar
         placeholder="Search"
@@ -41,6 +45,7 @@ function EventList({ navigation }) {
         </Card>
       ))}
     </View>
+    </SafeAreaView>
   );
 }
 

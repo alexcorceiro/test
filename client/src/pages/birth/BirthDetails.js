@@ -1,74 +1,94 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { SafeAreaView, View, StyleSheet, Text, Button } from 'react-native';
+import { Card, Title, Paragraph } from 'react-native-paper';
 import axios from 'axios';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomHeader from "../../components/CustomHeader";
+import { format, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
-const BirthDetailScreen = ({ route, navigation }) => {
-  const { id } = route.params;
-  const [birth, setBirth] = useState(null);
+function BirthDetails({ route, navigation }) {
+  const [birthDetails, setBirthDetails] = useState(null);
+  const { id } = route.params; // récupère l'ID de la naissance depuis les paramètres de navigation
 
   const fetchData = async () => {
-    try {
-      const response = await axios.get(`http://localhost:7000/birth/${id}`);
-      setBirth(response.data);
-    } catch (error) {
-      console.error("Failed to fetch birth:", error);
-    }
+    const token = await AsyncStorage.getItem("token");
+    const response = await axios.get(`http://localhost:7000/birth/${id}`, { headers: { Authorization: `Bearer ${token}`}});
+    setBirthDetails(response.data);
   };
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  if (!birth) {
+  if (!birthDetails) {
     return (
       <View style={styles.container}>
-        <Text style={styles.loading}>Loading...</Text>
+        <Text>Chargement...</Text>
       </View>
     );
   }
 
+  const handleDelete = () => {
+    // code pour gérer la suppression de la naissance
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>ID:</Text>
-      <Text style={styles.text}>{birth.id}</Text>
-      <Text style={styles.label}>Date:</Text>
-      <Text style={styles.text}>{birth.date}</Text>
-      <Text style={styles.label}>Number of babies:</Text>
-      <Text style={styles.text}>{birth.number_babies}</Text>
-      <Text style={styles.label}>Animal Name:</Text>
-      <Text style={styles.text}>{birth.animalName}</Text>
-      <View style={styles.buttonsContainer}>
-        <Button title="Edit" onPress={() => navigation.navigate('UpdateBirth', { id: birth.id })} />
-        <Button title="Delete" onPress={() => {/* Call API to delete birth here */}} />
+    <SafeAreaView style={styles.safeArea}>
+      <CustomHeader title="Détails de la naissance" isHome={false} navigation={navigation} />
+      <View style={styles.container}>
+        <Card style={styles.card}>
+          <Title style={styles.title}>Naissance du couple {birthDetails.pair.male.name} et {birthDetails.pair.female.name}</Title>
+          <Paragraph style={styles.paragraph}>{`Nombre de bébés: ${birthDetails.number_babies}`}</Paragraph>
+          <Paragraph style={styles.paragraph}>{`Date de naissance: ${birthDetails.date}`}</Paragraph>
+          <Paragraph style={styles.paragraph}>{`Père: ${birthDetails.pair.male.name}, espèce: ${birthDetails.pair.male.species}`}</Paragraph>
+          <Paragraph style={styles.paragraph}>{`Mère: ${birthDetails.pair.female.name}, espèce: ${birthDetails.pair.female.species}`}</Paragraph>
+          <Paragraph style={styles.paragraph}>{`Créé le: ${format(parseISO(birthDetails.created_at), "d MMMM yyyy", { locale: fr })}`}</Paragraph>
+          <Button title="Edit" onPress={() => navigation.navigate('UpdateBirth', { id: birthDetails.id })} color="#0000ff" style={styles.button} />
+          <Button title="Delete" onPress={handleDelete} color="#ff0000" style={styles.button} />
+        </Card>
       </View>
-    </View>
+    </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f8f8f8',
+  },
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f8f8f8'
+    padding: 16,
   },
-  loading: {
-    fontSize: 20,
-    textAlign: 'center'
+  card: {
+    marginVertical: 8,
+    padding: 16,
+    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  label: {
-    fontSize: 18,
+  title: {
+    marginBottom: 16,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginTop: 20
   },
-  text: {
-    fontSize: 16,
-    color: '#333'
+  paragraph: {
+    fontSize: 18,
+    marginBottom: 8,
   },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 30
-  }
+  button: {
+    marginTop: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
 });
 
-export default BirthDetailScreen;
+export default BirthDetails;

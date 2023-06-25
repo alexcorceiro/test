@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { SafeAreaView } from "react-native-safe-area-context";
+import CustomHeader from "../../components/CustomHeader";
 import { View, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { Searchbar, Card, Title, Paragraph, Button } from 'react-native-paper';
 import axios from 'axios';
@@ -36,13 +38,14 @@ const BirthListScreen = ({ navigation }) => {
           <Title>{`Birth ID: ${item.id}`}</Title>
           <Paragraph>{`Number of babies: ${item.number_babies}`}</Paragraph>
           <Paragraph>{`Date: ${item.date}`}</Paragraph>
-          <Paragraph>{`Animal Name: ${item.animalName}`}</Paragraph>
         </Card.Content>
       </Card>
     </TouchableOpacity>
   );
 
   return (
+    <SafeAreaView style={{ flex: 1 }}>
+    <CustomHeader title="Les naissance list" isHome={true} navigation={navigation} />
     <View style={styles.container}>
       <Searchbar
         placeholder="Search"
@@ -63,6 +66,7 @@ const BirthListScreen = ({ navigation }) => {
         renderItem={renderBirthItem}
       />
     </View>
+    </SafeAreaView>
   );
 };
 
